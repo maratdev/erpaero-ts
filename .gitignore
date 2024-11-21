@@ -2,7 +2,7 @@
 /dist
 /node_modules
 /build
-
+/.clinic
 # Logs
 logs
 *.log

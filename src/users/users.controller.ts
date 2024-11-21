@@ -1,33 +1,48 @@
-import {BaseController} from "../common/base.controller.js";
-import {LoggerService} from "../logger/logger.service.js";
-import {NextFunction, Request, Response} from "express";
-import {HttpError} from "../errors/http-error.class.js";
+import { BaseController } from '../common/base.controller';
+import { NextFunction, Request, Response } from 'express';
+import { HttpError } from '../errors/http-error.class';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../types';
+import { ILogger } from '../logger/logger.interface';
+import 'reflect-metadata';
+import { IUserController } from './users.controller.interface';
+import { UserLoginDto } from './dto/user-login';
+import { UserRegisterDto } from './dto/user-register';
+import { UsersService } from './users.service';
 
-export class UsersController extends BaseController {
-    constructor(
-        logger: LoggerService,
-    ) {
-        super(logger);
-        this.bindRoutes([
-            {
-                path: '/register',
-                method: 'post',
-                func: this.register,
-            },
-            {
-                path: '/login',
-                method: 'post',
-                func: this.login,
-            },
-        ]);
-    }
+@injectable()
+export class UsersController extends BaseController implements IUserController {
+	constructor(
+		@inject(TYPES.ILogger) loggerService: ILogger,
+		@inject(TYPES.UserService) private readonly userService: UsersService,
+	) {
+		super(loggerService);
+		this.bindRoutes([
+			{
+				path: '/register',
+				method: 'post',
+				func: this.register,
+			},
+			{
+				path: '/login',
+				method: 'post',
+				func: this.login,
+			},
+		]);
+	}
 
-    login(req: Request, res: Response, next: NextFunction) {
-        next(new HttpError(401, 'register', 'auth'));
+	login(req: Request<any, any, UserLoginDto>, res: Response, next: NextFunction): void {
+		console.log(req.body);
+		next(new HttpError(401, 'register', 'auth'));
+	}
 
-    }
-
-    register(req: Request, res: Response, next: NextFunction) {
-        this.ok(res, 'register')
-    }
+	async register(
+		{ body }: Request<any, any, UserRegisterDto>,
+		res: Response,
+		next: NextFunction,
+	): Promise<void> {
+		const newUser = await this.userService.create(body);
+		if (!newUser) return next(new HttpError(422, 'Такой пользователь уже существует', 'auth'));
+		this.ok(res, newUser);
+	}
 }
