@@ -32,6 +32,7 @@ export default tseslint.config(
     rules: {
       ...prettierPlugin.configs.recommended.rules,
       ...eslintConfigPrettier.rules,
+      "no-console": "warn",
       "@typescript-eslint/ban-types": "off",
       "@typescript-eslint/no-unused-vars": [
         "off"

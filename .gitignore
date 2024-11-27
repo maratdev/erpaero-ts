@@ -3,6 +3,8 @@
 /node_modules
 /build
 /.clinic
+/prisma/dev.db
+/prisma/dev.db-journal
 # Logs
 logs
 *.log
