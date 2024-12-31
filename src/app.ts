@@ -52,4 +52,7 @@ export class App {
 			this.logger.log(`Server is running on port ${this.port}`);
 		});
 	}
+	public close(): void {
+		this.server.close();
+	}
 }
